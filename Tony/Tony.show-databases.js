@@ -1,32 +1,18 @@
-var credentials = require('./credentials.json');
+mysql=require('mysql');
+dbf=require('./Tony.dbf-setup.js');
 
-var mysql=require("mysql");
-var Promise = require('bluebird');
-var using = Promise.using;
-Promise.promisifyAll(require("mysql/lib/Connection").prototype);
-Promise.promisifyAll(require("mysql/lib/Pool").prototype);
+var getDatabases=function(){//Returns a promise that can take a handler ready to process the results
+  var sql = "SHOW DATABASES";
+  return dbf.query(mysql.format(sql)); //Return a promise
+}
 
-credentials.host="ids"
-var pool = mysql.createPool(credentials);
+var processDBFs=function(queryResults){
+  // dbfs is an array of stuff
+   dbfs=queryResults;
+   return(dbfs);
+}
 
-var getConnection=function(){
-    return pool.getConnectionAsync().disposer(
-        function(connection){
-          return connection.release();
-        }
-    );
-};
-
-var query=function(command){
-    return using(getConnection(),function(connection){
-       return connection.queryAsync(command);
-    });
-};
-
-sql="SHOW DATABASES"
-var result=query(mysql.format(sql)) //result is a promise
-result.then(function(dbfs,err){
-  console.log(dbfs)
-}).then(function(){
-  pool.end()
-});
+dbf=getDatabases()
+.then(processDBFs)
+.then(function(results){console.log(results)})
+.then(dbf.releaseDBF);
