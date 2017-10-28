@@ -8,7 +8,7 @@ var getDatabases=function(){//Returns a promise that can take a handler ready to
 }
 
 var processDBFs=function(queryResults){ //Returns a promise that forces ALL dbfPromises to resolve before .thening()
-   var dbfs=queryResults[0];
+   var dbfs=queryResults;
    return(Promise.all(dbfs.map(dbfToPromise)).then(processTables))
 }
 
@@ -24,7 +24,7 @@ var dbfToPromise=function(dbfObj){
   var dbf=dbfObj.Database
   var sql = mysql.format("SHOW TABLES IN ??",dbf);
   var queryPromise=DBF.query(sql)
-  queryPromise=queryPromise.then(function(results){return({table:results[0],dbf:dbf})});
+  queryPromise=queryPromise.then(function(results){return({table:results,dbf:dbf})});
   return(queryPromise);
 }
 
@@ -43,7 +43,7 @@ var tableAndDbfToPromise=function(obj){
    var describeTable=function(val,index){
        var table=dbf+"."+val;
        var printer=function(results){
-          var desc=results[0];
+          var desc=results;
           if(index==0){console.log("---|",dbf,">")};
           console.log(".....|"+table,">");
           desc.map(function(field){ // show the fields nicely
@@ -56,7 +56,7 @@ var tableAndDbfToPromise=function(obj){
        return(promise);
    }
    var describePromises = tables.map(describeTable);
-   return (Promise.all(describePromises));
+   return(Promise.all(describePromises))
 }
 
 var dbf=getDatabases()
