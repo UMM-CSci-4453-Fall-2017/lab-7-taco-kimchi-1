@@ -7,9 +7,14 @@ Promise.promisifyAll(require("mysql/lib/Connection").prototype);
 Promise.promisifyAll(require("mysql/lib/Pool").prototype);
 
 credentials.host="ids";
-var connection = mysql.createConnection(credentials);
 
-var pool = mysql.createPool(credentials); // Setup the pool using our credentials.
+var connection;
+var pool; // Setup the pool using our credentials.
+
+var generateConnection = function() {
+  connection = mysql.createConnection(credentials);
+  pool = mysql.createPool(credentials);
+}
 
 // Overwrite getConnection that returns a Promise
 var getConnection = function() {
@@ -30,5 +35,6 @@ var endPool = function () {
   pool.end(function(err){});
 }
 
+exports.generateConnection = generateConnection;
 exports.query = query;
 exports.releaseDBF = endPool;

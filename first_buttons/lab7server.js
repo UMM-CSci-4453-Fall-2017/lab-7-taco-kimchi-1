@@ -10,6 +10,7 @@ var buttons=[{"buttonID":1,"left":10,"top":70,"width":100,"label":"hotdogs","inv
 
 var getDatabases=function(db){//Returns a promise that can take a handler ready to process the results
   var sql = "SELECT * from Tony.till_buttons";
+  db.generateConnection();
   return db.query(mysql.format(sql)); //Return a promise
 }
 
@@ -20,7 +21,7 @@ app.get("/buttons",function(req,res){ // handles the /buttons API
   .then(function (results) {
     res.send(results);
   })
-  // .then(DBF.releaseDBF)
+  .then(DBF.releaseDBF)
   .catch(function(err){console.log("DANGER:",err)});
 });
 
